@@ -7,11 +7,29 @@ import 'views/explore.dart';
 import 'views/chat.dart';
 import 'views/account.dart';
 import 'views/components/my_bottom_nav.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-void main() => runApp(const MyApp());
+// void main() => runApp(const MyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+      options: const FirebaseOptions(
+        apiKey: "AAAAmYoBRaM:APA91bGrjoHKt8Co8yRSTvzmLLRuUykxVVGqPhzCVoQ69k6c-ruSxXEUjdPbkSpE9H2c7siOkeZQ_AmQvtbDF9mnF9KhyAEpUfq-PCw3fb3wuibI3UdhjM8V-OaW2D4HwY4A_y4yL_dK",
+        appId: "1:659445335459:android:d792ab8b6b14ea45c70616",
+        messagingSenderId: "659445335459",
+        projectId: "wilt-guard-project",
+      ),
+  );
+  // Configure FirebaseAuth settings
+  // FirebaseAuth.instance.app = const AuthSettings(
+  //   appVerificationDisabledForTesting: true,
+  // );
+  // await Firebase.initializeApp();
+  runApp(const MyApp());
+}
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,20 +41,22 @@ class MyApp extends StatelessWidget {
         "/": (context) => const StartPage(),
         '/login': (context) => const Login(),
         '/signup': (context) => const SignUp(),
-        '/home': (context) => MainPage(),
+        '/home': (context) => const MainPage(),
       },
     );
   }
 }
 
 class MainPage extends StatefulWidget {
+  const MainPage({super.key});
+
   @override
   _MainPageState createState() => _MainPageState();
 }
 
 class _MainPageState extends State<MainPage> {
   int _selectedIndex = 0;
-  final List<Widget> _widgetOptions = [Home(), Explore(), Chat(), Account()];
+  final List<Widget> _widgetOptions = [const Home(), const Explore(), const Chat(), const Account()];
 
   void _onItemTapped(int index) {
     setState(() {

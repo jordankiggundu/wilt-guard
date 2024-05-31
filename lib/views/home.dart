@@ -3,7 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 class Home extends StatefulWidget {
-  const Home({Key? key}) : super(key: key);
+  const Home({super.key});
 
   @override
   _HomeState createState() => _HomeState();
@@ -13,8 +13,8 @@ class _HomeState extends State<Home> {
   XFile? _image;
 
   Future getImage() async {
-    final ImagePicker _picker = ImagePicker();
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
     setState(() {
       _image = image;
@@ -25,25 +25,25 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        SizedBox(
-          height: 30,
+        const SizedBox(
+          height: 40,
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             IconButton(
-              icon: Icon(Icons.arrow_back),
+              icon: const Icon(Icons.arrow_back),
               onPressed: () {
                 Navigator.pushNamed(context, '/login');
               },
             ),
           ],
         ),
-        SizedBox(
+        const SizedBox(
           height: 10,
         ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
+        const Padding(
+          padding: EdgeInsets.all(8.0),
           child: Text(
             'Choose image for diagnosis',
             style: TextStyle(
@@ -57,13 +57,13 @@ class _HomeState extends State<Home> {
             textAlign: TextAlign.center,
           ),
         ),
-        SizedBox(
+        const SizedBox(
           height: 10,
         ),
         Expanded(
           child: _image == null
               ? Padding(
-                  padding: EdgeInsets.all(20.0),
+                  padding: const EdgeInsets.all(20.0),
                   child: Card(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -75,7 +75,7 @@ class _HomeState extends State<Home> {
                           onPressed: () {
                             getImage();
                           },
-                          icon: Icon(Icons.add),
+                          icon: const Icon(Icons.add),
                           color: Colors.green,
                           iconSize: 90,
                         ),
@@ -85,19 +85,19 @@ class _HomeState extends State<Home> {
                 )
               : Image.file(File(_image!.path)),
         ),
-        SizedBox(
+        const SizedBox(
           height: 20,
         ),
         ElevatedButton(
           onPressed: () {},
           style: ElevatedButton.styleFrom(
-            primary: Colors.green,
-            minimumSize: Size(300, 55),
-            padding: EdgeInsets.all(16),
+            backgroundColor: Colors.green,
+            minimumSize: const Size(300, 55),
+            padding: const EdgeInsets.all(16),
           ),
-          child: Text('UPLOAD'),
+          child: const Text('UPLOAD', style: TextStyle(color: Colors.white),),
         ),
-        SizedBox(
+        const SizedBox(
           height: 30,
         )
       ],

@@ -9,7 +9,7 @@ class SignUp extends StatelessWidget {
     return Expanded(
       child: Container(
         clipBehavior: Clip.antiAlias,
-        decoration: BoxDecoration(color: Colors.white),
+        decoration: const BoxDecoration(color: Colors.white),
         child: Stack(
           children: [
             Positioned(
@@ -32,10 +32,10 @@ class SignUp extends StatelessWidget {
             Positioned(
               left: MediaQuery.of(context).size.width * 0.3,
               top: MediaQuery.of(context).size.height * 0.25,
-              child: SizedBox(
+              child: const SizedBox(
                 width: 170,
                 height: 25,
-                child: const Material(
+                child: Material(
                   child: Text.rich(
                     TextSpan(
                       children: [
@@ -69,11 +69,11 @@ class SignUp extends StatelessWidget {
             ),
             Positioned(
               left: MediaQuery.of(context).size.width * 0.4,
-              top: MediaQuery.of(context).size.height * 0.05,
+              top: MediaQuery.of(context).size.height * 0.1,
               child: Container(
                 width: 80,
                 height: 100,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   image: DecorationImage(
                     image: AssetImage('assets/logo.png'),
                     fit: BoxFit.cover,
@@ -85,8 +85,9 @@ class SignUp extends StatelessWidget {
               left: MediaQuery.of(context).size.width * 0.1,
               top: MediaQuery.of(context).size.height * 0.32,
               child: SizedBox(
+                height: MediaQuery.of(context).size.height * 0.85,
                 width: MediaQuery.of(context).size.width * 0.8,
-                child: RegistrationForm(),
+                child: const RegistrationForm(),
               ),
             ),
           ],

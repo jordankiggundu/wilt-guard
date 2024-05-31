@@ -14,7 +14,7 @@ class StartPage extends StatelessWidget {
               children: <Widget>[
                 Center(
                     child: Container(
-                  margin: EdgeInsets.only(top: 100),
+                  margin: const EdgeInsets.only(top: 100),
                   child: Align(
                       alignment: Alignment.center,
                       child: MaterialButton(
@@ -23,12 +23,12 @@ class StartPage extends StatelessWidget {
                         },
                         minWidth: 306,
                         height: 57,
-                        color: Color(0xFF39B54A),
+                        color: const Color(0xFF39B54A),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(5),
                         ),
-                        elevation: 30,
-                        child: Text(
+                        elevation: 10,
+                        child: const Text(
                           'Get started',
                           textAlign: TextAlign.center,
                           style: TextStyle(
@@ -42,10 +42,10 @@ class StartPage extends StatelessWidget {
                         ),
                       )),
                 )),
-                Center(
+                const Center(
                   child: Align(
                     alignment: Alignment.center,
-                    child: const Material(
+                    child: Material(
                       child: SizedBox(
                         width: 170,
                         height: 34,
@@ -82,7 +82,7 @@ class StartPage extends StatelessWidget {
                   ),
                 ),
                 Positioned(
-                  top: MediaQuery.of(context).size.height * 0.2,
+                  top: MediaQuery.of(context).size.height * 0.25,
                   left: MediaQuery.of(context).size.width * 0.4,
                   child: Container(
                     width: 84.90,

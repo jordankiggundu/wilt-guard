@@ -4,8 +4,8 @@ class CustomBottomNavigationBar extends StatefulWidget {
   final Function(int) onTabSelected;
   final List<Widget> widgetOptions;
 
-  CustomBottomNavigationBar(
-      {required this.widgetOptions, required this.onTabSelected});
+  const CustomBottomNavigationBar(
+      {super.key, required this.widgetOptions, required this.onTabSelected});
 
   @override
   _CustomBottomNavigationBarState createState() =>

@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 
 class Chat extends StatefulWidget {
-  const Chat({Key? key}) : super(key: key);
+  const Chat({super.key});
 
   @override
-  _ChatState createState() => _ChatState();
+  ChatState createState() => ChatState();
 }
 
-class _ChatState extends State<Chat> {
+class ChatState extends State<Chat> {
   final TextEditingController _controller = TextEditingController();
   final List<String> _messages = [
     "hello man",
-    "hello word hello word hello word hello wordhello word hello word hello word hello word hello word"
+    "hello word hello word hell word hello word hello word"
   ];
 
   void _sendMessage() {
@@ -26,20 +26,20 @@ class _ChatState extends State<Chat> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        SizedBox(
-          height: 30,
+        const SizedBox(
+          height: 40,
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             IconButton(
-              icon: Icon(Icons.arrow_back),
+              icon: const Icon(Icons.arrow_back),
               onPressed: () {
                 Navigator.pushNamed(context, '/login');
               },
             ),
-            Padding(
-              padding: const EdgeInsets.only(right: 20),
+            const Padding(
+              padding: EdgeInsets.only(right: 20),
               child: Text(
                 'chat',
                 style: TextStyle(
@@ -55,11 +55,11 @@ class _ChatState extends State<Chat> {
             )
           ],
         ),
-        SizedBox(
+        const SizedBox(
           height: 10,
         ),
-        Padding(
-          padding: const EdgeInsets.only(right: 20),
+        const Padding(
+          padding: EdgeInsets.only(right: 20),
           child: Text(
             'Chat with our Agriculture AI',
             style: TextStyle(
@@ -73,7 +73,7 @@ class _ChatState extends State<Chat> {
             textAlign: TextAlign.center,
           ),
         ),
-        SizedBox(
+        const SizedBox(
           height: 10,
         ),
         Expanded(
@@ -84,11 +84,11 @@ class _ChatState extends State<Chat> {
             },
           ),
         ),
-        SizedBox(
+        const SizedBox(
           height: 20,
         ),
         messageBox(_controller, _sendMessage),
-        SizedBox(
+        const SizedBox(
           height: 20,
         ),
       ],
@@ -104,7 +104,7 @@ class _ChatState extends State<Chat> {
       decoration: ShapeDecoration(
         color: Colors.white,
         shape: RoundedRectangleBorder(
-          side: BorderSide(width: 1, color: Color(0xFF39B54A)),
+          side: const BorderSide(width: 1, color: Color(0xFF39B54A)),
           borderRadius: BorderRadius.circular(5),
         ),
       ),
@@ -116,7 +116,7 @@ class _ChatState extends State<Chat> {
           Flexible(
             child: TextField(
               controller: controller,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Message here ...',
                 hintStyle: TextStyle(
                   color: Color(0xFF9098B1),
@@ -134,7 +134,7 @@ class _ChatState extends State<Chat> {
             alignment: Alignment.center,
             child: IconButton(
               color: Colors.green,
-              icon: Icon(Icons.send),
+              icon: const Icon(Icons.send),
               onPressed: sendMessage,
             ),
           )
@@ -151,7 +151,7 @@ Widget message(context, mssg) {
     margin: const EdgeInsets.all(10),
     clipBehavior: Clip.antiAlias,
     decoration: ShapeDecoration(
-      color: Color(0xFFF6F6F6),
+      color: const Color(0xFFF6F6F6),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),
@@ -164,7 +164,7 @@ Widget message(context, mssg) {
         SizedBox(
           child: Text(
             mssg,
-            style: TextStyle(
+            style: const TextStyle(
               color: Color(0xFF9098B1),
               fontSize: 12,
               fontFamily: 'Poppins',

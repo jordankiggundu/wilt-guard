@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:random_string/random_string.dart';
+import 'package:wilt_guard/services/database.dart';
 
 class RegistrationForm extends StatefulWidget {
   const RegistrationForm({super.key});
   @override
-  _RegistrationFormState createState() => _RegistrationFormState();
+  RegistrationFormState createState() => RegistrationFormState();
 }
 
-class _RegistrationFormState extends State<RegistrationForm> {
+class RegistrationFormState extends State<RegistrationForm> {
   final _formKey = GlobalKey<FormState>();
 
-  String _username = '';
-  String _email = '';
-  String _password = '';
-  String _confirmPassword = '';
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    return Material(
+    return Scaffold ( body: Material(
         child: Form(
       key: _formKey,
       child: Column(
@@ -45,13 +46,13 @@ class _RegistrationFormState extends State<RegistrationForm> {
               }
               return null;
             },
-            onSaved: (value) => _username = value!,
+            controller: _usernameController,
           ),
           const SizedBox(
             height: 10,
           ),
           TextFormField(
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               prefixIcon: Icon(
                 Icons.email,
                 color: Colors.orange,
@@ -76,13 +77,13 @@ class _RegistrationFormState extends State<RegistrationForm> {
               }
               return null;
             },
-            onSaved: (value) => _email = value!,
+            controller: _emailController,
           ),
           const SizedBox(
             height: 10,
           ),
           TextFormField(
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               prefixIcon: Icon(
                 Icons.lock,
                 color: Colors.orange,
@@ -106,13 +107,13 @@ class _RegistrationFormState extends State<RegistrationForm> {
               }
               return null;
             },
-            onSaved: (value) => _password = value!,
+            controller: _passwordController,
           ),
           const SizedBox(
             height: 10,
           ),
           TextFormField(
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               prefixIcon: Icon(
                 Icons.lock,
                 color: Colors.orange,
@@ -134,35 +135,84 @@ class _RegistrationFormState extends State<RegistrationForm> {
               if (value == null || value.isEmpty) {
                 return 'Please confirm your password';
               }
+              String pass = _passwordController.text;
+              if (value != pass) {
+                return 'Passwords do not match';
+              }
               return null;
             },
-            onSaved: (value) => _confirmPassword = value!,
+            // controller: _passwordController,
           ),
           const SizedBox(
             height: 20,
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               if (_formKey.currentState!.validate()) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Processing Data')),
-                );
+                String id = randomAlphaNumeric(10);
+                String username = _usernameController.text;
+                String email = _emailController.text;
+                String password = _passwordController.text;
+
+                Map<String, dynamic> userInfo = {
+                  "username": username,
+                  "email": email,
+                  "password": password,
+                };
+                try {
+                  await DatabaseMethods().addUser(userInfo, id);
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text("REGISTERED"),
+                        content: const Text("Account created successfully"),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.popAndPushNamed(context,'/login');
+                            },
+                            child: Text("OK"),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+
+                } catch (e) {
+                  // Handle any errors that might occur during database operation
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text("ERROR",style: TextStyle(color: Colors.red),),
+                        content: const Text("Error occurred." ),
+                        actions: [
+                          TextButton(
+                            onPressed: () {},
+                            child: Text("OK"),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
               }
             },
             style: ElevatedButton.styleFrom(
-              primary: Colors.green,
-              minimumSize: Size(300, 55),
-              padding: EdgeInsets.all(16),
+              backgroundColor: Colors.green,
+              minimumSize: const Size(300, 55),
+              padding: const EdgeInsets.all(16),
             ),
-            child: Text('Register'),
+            child: const Text('Register',style: TextStyle(color:Colors.white),),
           ),
           const SizedBox(height: 20),
           RichText(
             textAlign: TextAlign.center,
             text: TextSpan(
               children: [
-                TextSpan(
-                  text: 'Have an account?',
+                const TextSpan(
+                  text: 'Got an account? ',
                   style: TextStyle(
                     color: Color(0xFF9098B1),
                     fontSize: 12,
@@ -178,14 +228,13 @@ class _RegistrationFormState extends State<RegistrationForm> {
                       Navigator.popAndPushNamed(context,
                           '/login'); // Replace '/signup' with the actual route
                     },
-                    child: Text(
+                    child: const Text(
                       'LOGIN',
                       style: TextStyle(
                         color: Color(0xFF39B54A),
-                        fontSize: 12,
+                        fontSize: 15,
                         fontFamily: 'Poppins',
                         fontWeight: FontWeight.w700,
-                        height: 0.12,
                         letterSpacing: 0.50,
                       ),
                     ),
@@ -196,6 +245,15 @@ class _RegistrationFormState extends State<RegistrationForm> {
           ),
         ],
       ),
-    ));
+    )));
   }
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
 }

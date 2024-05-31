@@ -1,4 +1,8 @@
 import "package:flutter/material.dart";
+import "package:get/get.dart";
+
+import "../../controllers/user_controller.dart";
+import "../../services/database.dart";
 
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
@@ -9,8 +13,8 @@ class LoginForm extends StatefulWidget {
 class _LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
 
-  String _email = '';
-  String _password = '';
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +24,7 @@ class _LoginFormState extends State<LoginForm> {
       child: Column(
         children: [
           TextFormField(
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               prefixIcon: Icon(
                 Icons.mail,
                 color: Colors.orange,
@@ -45,13 +49,13 @@ class _LoginFormState extends State<LoginForm> {
               }
               return null;
             },
-            onSaved: (value) => _email = value!,
+            controller: _emailController,
           ),
           const SizedBox(
             height: 10,
           ),
           TextFormField(
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               prefixIcon: Icon(
                 Icons.lock,
                 color: Colors.orange,
@@ -75,26 +79,65 @@ class _LoginFormState extends State<LoginForm> {
               }
               return null;
             },
-            onSaved: (value) => _password = value!,
+            controller: _passwordController,
           ),
           const SizedBox(
             height: 20,
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               if (_formKey.currentState!.validate()) {
-                // ScaffoldMessenger.of(context).showSnackBar(
-                //   SnackBar(content: Text('Processing Data')),
-                // );
-                Navigator.pushNamed(context, '/home');
+                String email = _emailController.text;
+                String password = _passwordController.text;
+
+                Map<String, dynamic> userInfo = {
+                  "email": email,
+                  "password": password,
+                };
+                try {
+                  bool userRetrieved = await DatabaseMethods().getUser(userInfo["email"], userInfo["password"]);
+                  if (userRetrieved) {
+                    // Update the state in the controller
+                    Get.find<UserController>().updateUser(userRetrieved as Map<String, dynamic>);
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text("WELCOME",style: TextStyle(color:Colors.green)),
+                        content: const Text("Logged in successfully :)",
+                        style: TextStyle(color:Colors.orange),),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pushNamed(context, '/home');                            },
+                            child: const Text("OK"),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                  }
+
+                } catch (e) {
+                  // Handle any errors that might occur during database operation
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return const AlertDialog(
+                        title: Text("ERROR",style: TextStyle(color: Colors.red),),
+                        content: Text("Please check your details" ),
+                      );
+                    },
+                  );
+                }
               }
             },
             style: ElevatedButton.styleFrom(
-              primary: Colors.green,
-              minimumSize: Size(300, 55),
-              padding: EdgeInsets.all(16),
+              backgroundColor: Colors.green,
+              minimumSize: const Size(300, 55),
+              padding: const EdgeInsets.all(16),
             ),
-            child: Text('LOGIN'),
+            child: const Text('LOGIN',style: TextStyle(color: Colors.white),),
           ),
           const SizedBox(height: 30),
           Positioned(
@@ -108,10 +151,9 @@ class _LoginFormState extends State<LoginForm> {
                       text: 'Don\'t have an account?',
                       style: TextStyle(
                         color: Color(0xFF9098B1),
-                        fontSize: 12,
+                        fontSize:15,
                         fontFamily: 'Poppins',
                         fontWeight: FontWeight.w400,
-                        height: 0.12,
                         letterSpacing: 0.50,
                       ),
                     ),
@@ -119,16 +161,15 @@ class _LoginFormState extends State<LoginForm> {
                       child: GestureDetector(
                         onTap: () {
                           Navigator.pushNamed(context,
-                              '/signup'); // Replace '/signup' with the actual route
+                              '/signup');
                         },
                         child: const Text(
                           ' Sign Up',
                           style: TextStyle(
                             color: Color(0xFF39B54A),
-                            fontSize: 12,
+                            fontSize: 15,
                             fontFamily: 'Poppins',
                             fontWeight: FontWeight.w700,
-                            height: 0.12,
                             letterSpacing: 0.50,
                           ),
                         ),

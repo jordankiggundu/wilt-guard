@@ -1,26 +1,26 @@
 import 'package:flutter/material.dart';
 
 class Explore extends StatelessWidget {
-  const Explore({Key? key}) : super(key: key);
+  const Explore({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        SizedBox(
-          height: 30,
+        const SizedBox(
+          height: 40,
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             IconButton(
-              icon: Icon(Icons.arrow_back),
+              icon: const Icon(Icons.arrow_back),
               onPressed: () {
                 Navigator.pushNamed(context, '/login');
               },
             ),
-            Padding(
-              padding: const EdgeInsets.only(right: 20),
+            const Padding(
+              padding: EdgeInsets.only(right: 20),
               child: Text(
                 'Feed',
                 style: TextStyle(
@@ -36,11 +36,11 @@ class Explore extends StatelessWidget {
             )
           ],
         ),
-        SizedBox(
+        const SizedBox(
           height: 20,
         ),
         feed(context),
-        SizedBox(
+        const SizedBox(
           height: 20,
         )
       ],
@@ -55,12 +55,12 @@ feed(context) {
     padding: const EdgeInsets.only(left: 2, right: 44, bottom: 8),
     clipBehavior: Clip.antiAlias,
     decoration: ShapeDecoration(
-      color: Color(0xFFF6F6F6),
+      color: const Color(0xFFF6F6F6),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),
     ),
-    child: Column(
+    child: const Column(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -79,7 +79,7 @@ feed(context) {
             ),
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         SizedBox(
           width: 283,
           child: Text(
@@ -94,7 +94,7 @@ feed(context) {
             ),
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         SizedBox(
           width: 283,
           child: Text(

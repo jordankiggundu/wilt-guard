@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "659445335459",
+    "project_id": "wilt-guard-project",
+    "storage_bucket": "wilt-guard-project.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:659445335459:android:d792ab8b6b14ea45c70616",
+        "android_client_info": {
+          "package_name": "com.example.wilt_guard"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAS3AZfNj9Z-FOYHnLEXvlz2OmfNnyv0Xc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

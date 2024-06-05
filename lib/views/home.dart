@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'dart:io';
-
+import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:wiltguard/controllers/user_controller.dart';
 
 class Home extends StatefulWidget {
@@ -24,6 +24,31 @@ class _HomeState extends State<Home> {
     });
   }
 
+  bool _isLoading = false;
+
+  //gemini  model
+  GenerativeModel model = GenerativeModel(
+      model: 'gemini-1.5-flash',
+      apiKey: 'AIzaSyCb9Eq57W632qWyjEbFaO47aQXoTqVuIYA');
+  var responseData = '';
+  Future<void> checkCoffeeWilt(String imagePath) async {
+    // Read the image bytes
+    final imageBytes = await File(imagePath).readAsBytes();
+    const prompt =
+        'Are the leaves in this image infected by coffee wilt? Reply with response only in json format {status: "true/false/unknown", comment:"here, you mention three brief reccomendations for preventions/control of coffee wilt if status:true (coffee wilt detected), None if status:false(not detected,leaves look healthy) or status:unknown(image is not of leaves/leaves have other disease, mention what you see instead)" }';
+    // Prepare the content for the request
+    final content = [
+      Content.multi([
+        TextPart(prompt),
+        DataPart('image/png', imageBytes),
+      ])
+    ];
+    //return response
+    final response = await model.generateContent(content);
+    print(response.text);
+    responseData = response.text!;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -37,7 +62,8 @@ class _HomeState extends State<Home> {
             IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: () {
-                Provider.of<UserController>(context, listen: false).setCurrentUser(null);
+                Provider.of<UserController>(context, listen: false)
+                    .setCurrentUser(null);
                 Navigator.pushNamed(context, '/login');
               },
             ),
@@ -92,15 +118,32 @@ class _HomeState extends State<Home> {
         const SizedBox(
           height: 20,
         ),
-        ElevatedButton(
-          onPressed: () {},
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green,
-            minimumSize: const Size(300, 55),
-            padding: const EdgeInsets.all(16),
-          ),
-          child: const Text('UPLOAD', style: TextStyle(color: Colors.white),),
-        ),
+        _isLoading
+            ? const CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.green))
+            : ElevatedButton(
+                onPressed: () async {
+                  if (_image != null) {
+                    setState(() {
+                      _isLoading = true;
+                    });
+                    await checkCoffeeWilt(_image!.path);
+                    print(responseData);
+                    setState(() {
+                      _isLoading = false;
+                    });
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  minimumSize: const Size(300, 55),
+                  padding: const EdgeInsets.all(16),
+                ),
+                child: const Text(
+                  'SUBMIT',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
         const SizedBox(
           height: 30,
         )

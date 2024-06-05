@@ -27,14 +27,11 @@ class ChatState extends State<Chat> {
     final response = await model.generateContent(content);
     final textResponse = response.text ?? '';
 
-    print(response.text);
     if (textResponse.isNotEmpty) {
       setState(() {
         _messages.add(Message(query, textResponse));
         _controller.clear();
       });
-    } else {
-      print("response is empty");
     }
     _isLoading = false;
   }

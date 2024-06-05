@@ -1,4 +1,4 @@
-package com.example.wilt_guard
+package com.example.wiltGuard
 
 import io.flutter.embedding.android.FlutterActivity
 

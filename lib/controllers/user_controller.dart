@@ -1,11 +1,11 @@
-import 'package:get/get.dart';
+import 'package:flutter/foundation.dart';
+import 'package:wiltguard/models/user_model.dart';
 
-class UserController extends GetxController {
-  // Reactive variable for user info
-  var userInfo = Rx<Map<String, dynamic>>({}).obs;
-
-  // Method to update user info
-  void updateUser(Map<String, dynamic> newUserInfo) {
-    userInfo.value = newUserInfo as Rx<Map<String, dynamic>>;
+class UserController extends ChangeNotifier {
+  UserModel? _currentUser;
+  UserModel? get currentUser => _currentUser;
+  void setCurrentUser(UserModel? user) {
+    _currentUser = user;
+    notifyListeners(); // Notify listeners about the change
   }
 }

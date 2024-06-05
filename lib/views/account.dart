@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:wiltguard/controllers/user_controller.dart';
 
 class Account extends StatefulWidget {
   const Account({super.key});
@@ -9,12 +11,25 @@ class Account extends StatefulWidget {
 
 class AccountState extends State<Account> {
   final _formKey = GlobalKey<FormState>();
-  String _username = '';
-  String _email = '';
-  String _password = '';
 
   @override
   Widget build(BuildContext context) {
+    final usernameController = TextEditingController(
+        text: Provider.of<UserController>(context, listen: false)
+                .currentUser
+                ?.username ??
+            '');
+    final emailController = TextEditingController(
+        text: Provider.of<UserController>(context, listen: false)
+                .currentUser
+                ?.email ??
+            '');
+    final passwordController = TextEditingController(
+        text: Provider.of<UserController>(context, listen: false)
+                .currentUser
+                ?.password ??
+            '');
+
     return Form(
       key: _formKey,
       child: Column(
@@ -28,6 +43,7 @@ class AccountState extends State<Account> {
               IconButton(
                 icon: const Icon(Icons.arrow_back),
                 onPressed: () {
+                  Provider.of<UserController>(context, listen: false).setCurrentUser(null);
                   Navigator.pushNamed(context, '/login');
                 },
               ),
@@ -68,8 +84,8 @@ class AccountState extends State<Account> {
                     ),
                   ],
                 ),
-                child:
-                    const Icon(Icons.person_outlined, color: Colors.grey, size: 60),
+                child: const Icon(Icons.person_outlined,
+                    color: Colors.grey, size: 60),
               ),
             ),
           ),
@@ -77,6 +93,7 @@ class AccountState extends State<Account> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: TextFormField(
+              controller: usernameController,
               decoration: const InputDecoration(
                 prefixIcon: Icon(Icons.person, color: Colors.orange),
                 labelText: 'Username',
@@ -95,17 +112,13 @@ class AccountState extends State<Account> {
                 }
                 return null;
               },
-              onChanged: (value) {
-                setState(() {
-                  _username = value;
-                });
-              },
             ),
           ),
           const SizedBox(height: 15),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: TextFormField(
+              controller: emailController,
               decoration: const InputDecoration(
                 prefixIcon: Icon(Icons.email, color: Colors.orange),
                 labelText: 'Email',
@@ -124,17 +137,13 @@ class AccountState extends State<Account> {
                 }
                 return null;
               },
-              onChanged: (value) {
-                setState(() {
-                  _email = value;
-                });
-              },
             ),
           ),
           const SizedBox(height: 15),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: TextFormField(
+              controller: passwordController,
               decoration: const InputDecoration(
                 prefixIcon: Icon(Icons.lock, color: Colors.orange),
                 labelText: 'Password',
@@ -153,11 +162,6 @@ class AccountState extends State<Account> {
                 }
                 return null;
               },
-              onChanged: (value) {
-                setState(() {
-                  _password = value;
-                });
-              },
             ),
           ),
           const SizedBox(height: 20),
@@ -172,11 +176,11 @@ class AccountState extends State<Account> {
               minimumSize: const Size(300, 55),
               padding: const EdgeInsets.all(5),
             ),
-            child: const Text('Edit', style: TextStyle(color: Colors.white),),
+            child: const Text(
+              'Edit',
+              style: TextStyle(color: Colors.white),
+            ),
           ),
-          const SizedBox(
-            height: 20,
-          )
         ],
       ),
     );

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:random_string/random_string.dart';
-import 'package:wilt_guard/services/database.dart';
+import '../../services/database.dart';
 
 class RegistrationForm extends StatefulWidget {
   const RegistrationForm({super.key});
@@ -14,11 +14,13 @@ class RegistrationFormState extends State<RegistrationForm> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold ( body: Material(
-        child: Form(
+    return Scaffold(
+        body: Material(
+            child: Form(
       key: _formKey,
       child: Column(
         children: [
@@ -148,6 +150,7 @@ class RegistrationFormState extends State<RegistrationForm> {
           ),
           ElevatedButton(
             onPressed: () async {
+              _isLoading = true;
               if (_formKey.currentState!.validate()) {
                 String id = randomAlphaNumeric(10);
                 String username = _usernameController.text;
@@ -161,6 +164,7 @@ class RegistrationFormState extends State<RegistrationForm> {
                 };
                 try {
                   await DatabaseMethods().addUser(userInfo, id);
+                  _isLoading = false;
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
@@ -170,7 +174,7 @@ class RegistrationFormState extends State<RegistrationForm> {
                         actions: [
                           TextButton(
                             onPressed: () {
-                              Navigator.popAndPushNamed(context,'/login');
+                              Navigator.popAndPushNamed(context, '/login');
                             },
                             child: Text("OK"),
                           ),
@@ -178,15 +182,17 @@ class RegistrationFormState extends State<RegistrationForm> {
                       );
                     },
                   );
-
                 } catch (e) {
                   // Handle any errors that might occur during database operation
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
-                        title: const Text("ERROR",style: TextStyle(color: Colors.red),),
-                        content: const Text("Error occurred." ),
+                        title: const Text(
+                          "ERROR",
+                          style: TextStyle(color: Colors.red),
+                        ),
+                        content: const Text("Error occurred."),
                         actions: [
                           TextButton(
                             onPressed: () {},
@@ -198,13 +204,20 @@ class RegistrationFormState extends State<RegistrationForm> {
                   );
                 }
               }
+              _isLoading = false;
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green,
               minimumSize: const Size(300, 55),
               padding: const EdgeInsets.all(16),
             ),
-            child: const Text('Register',style: TextStyle(color:Colors.white),),
+            child: _isLoading
+                ? const CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.orange))
+                : const Text(
+                    'Register',
+                    style: TextStyle(color: Colors.white),
+                  ),
           ),
           const SizedBox(height: 20),
           RichText(
@@ -255,5 +268,4 @@ class RegistrationFormState extends State<RegistrationForm> {
     _passwordController.dispose();
     super.dispose();
   }
-
 }

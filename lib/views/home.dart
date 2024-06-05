@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'dart:io';
+
+import 'package:wiltguard/controllers/user_controller.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -34,6 +37,7 @@ class _HomeState extends State<Home> {
             IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: () {
+                Provider.of<UserController>(context, listen: false).setCurrentUser(null);
                 Navigator.pushNamed(context, '/login');
               },
             ),

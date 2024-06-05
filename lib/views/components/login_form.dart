@@ -1,5 +1,6 @@
 import "package:flutter/material.dart";
-import "package:get/get.dart";
+import "package:provider/provider.dart";
+import "package:wiltguard/models/user_model.dart";
 
 import "../../controllers/user_controller.dart";
 import "../../services/database.dart";
@@ -7,12 +8,12 @@ import "../../services/database.dart";
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
   @override
-  _LoginFormState createState() => _LoginFormState();
+  LoginFormState createState() => LoginFormState();
 }
 
-class _LoginFormState extends State<LoginForm> {
+class LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
-
+  bool _isLoading = false;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -86,6 +87,7 @@ class _LoginFormState extends State<LoginForm> {
           ),
           ElevatedButton(
             onPressed: () async {
+              _isLoading = true;
               if (_formKey.currentState!.validate()) {
                 String email = _emailController.text;
                 String password = _passwordController.text;
@@ -94,38 +96,72 @@ class _LoginFormState extends State<LoginForm> {
                   "email": email,
                   "password": password,
                 };
+                Map<String, dynamic> result;
                 try {
-                  bool userRetrieved = await DatabaseMethods().getUser(userInfo["email"], userInfo["password"]);
-                  if (userRetrieved) {
-                    // Update the state in the controller
-                    Get.find<UserController>().updateUser(userRetrieved as Map<String, dynamic>);
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text("WELCOME",style: TextStyle(color:Colors.green)),
-                        content: const Text("Logged in successfully :)",
-                        style: TextStyle(color:Colors.orange),),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pushNamed(context, '/home');                            },
-                            child: const Text("OK"),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                  }
-
+                  result = await DatabaseMethods()
+                      .getUser(userInfo["email"], userInfo["password"]);
                 } catch (e) {
                   // Handle any errors that might occur during database operation
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
                       return const AlertDialog(
-                        title: Text("ERROR",style: TextStyle(color: Colors.red),),
-                        content: Text("Please check your details" ),
+                        title: Text(
+                          "ERROR",
+                          style: TextStyle(color: Colors.red),
+                        ),
+                        content: Text("Please check your details"),
+                      );
+                    },
+                  );
+                  _isLoading = false;
+                  return; // Exit early if there was an error
+                }
+                _isLoading = false;
+                if (result["exists"]) {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text("WELCOME",
+                            style: TextStyle(color: Colors.green)),
+                        content: const Text("Logged in successfully :",
+                            style: TextStyle(color: Colors.orange)),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Text("OK"),
+                          ),
+                        ],
+                      );
+                    },
+                  ).then((_) {
+                    // Check if responseData['data'] is not null before proceeding
+                    if (result['data'] != null &&
+                        result.containsKey('data') &&
+                        result['data'] != null) {
+                      Map<String, dynamic> userData = result['data'];
+                      UserModel userModel = UserModel.fromJson(userData);
+                      Provider.of<UserController>(context, listen: false)
+                          .setCurrentUser(userModel);
+
+                      Future.microtask(() {
+                        Navigator.pushNamed(context, '/home');
+                      });
+                    }
+                  });
+                } else {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return const AlertDialog(
+                        title: Text(
+                          "ERROR",
+                          style: TextStyle(color: Colors.red),
+                        ),
+                        content: Text("Please check your details / connection"),
                       );
                     },
                   );
@@ -137,7 +173,10 @@ class _LoginFormState extends State<LoginForm> {
               minimumSize: const Size(300, 55),
               padding: const EdgeInsets.all(16),
             ),
-            child: const Text('LOGIN',style: TextStyle(color: Colors.white),),
+            child: _isLoading
+                ? const CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.orange))
+                : const Text('LOGIN', style: TextStyle(color: Colors.white)),
           ),
           const SizedBox(height: 30),
           Positioned(
@@ -151,7 +190,7 @@ class _LoginFormState extends State<LoginForm> {
                       text: 'Don\'t have an account?',
                       style: TextStyle(
                         color: Color(0xFF9098B1),
-                        fontSize:15,
+                        fontSize: 15,
                         fontFamily: 'Poppins',
                         fontWeight: FontWeight.w400,
                         letterSpacing: 0.50,
@@ -160,8 +199,7 @@ class _LoginFormState extends State<LoginForm> {
                     WidgetSpan(
                       child: GestureDetector(
                         onTap: () {
-                          Navigator.pushNamed(context,
-                              '/signup');
+                          Navigator.pushNamed(context, '/signup');
                         },
                         child: const Text(
                           ' Sign Up',

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:wiltguard/controllers/user_controller.dart';
+import 'package:google_generative_ai/google_generative_ai.dart';
 
 class Chat extends StatefulWidget {
   const Chat({super.key});
@@ -9,17 +12,31 @@ class Chat extends StatefulWidget {
 
 class ChatState extends State<Chat> {
   final TextEditingController _controller = TextEditingController();
-  final List<String> _messages = [
-    "hello man",
-    "hello word hello word hell word hello word hello word"
-  ];
 
-  void _sendMessage() {
-    final String message = _controller.text;
-    setState(() {
-      _messages.insert(0, message);
-      _controller.clear();
-    });
+  final List<Message> _messages = [];
+
+  // GenerativeModel model;
+  GenerativeModel model = GenerativeModel(
+      model: 'gemini-1.5-flash',
+      apiKey: 'AIzaSyCb9Eq57W632qWyjEbFaO47aQXoTqVuIYA');
+  bool _isLoading = false;
+
+  Future<void> _sendMessage(String query) async {
+    _isLoading = true;
+    final content = [Content.text(query)];
+    final response = await model.generateContent(content);
+    final textResponse = response.text ?? '';
+
+    print(response.text);
+    if (textResponse.isNotEmpty) {
+      setState(() {
+        _messages.add(Message(query, textResponse));
+        _controller.clear();
+      });
+    } else {
+      print("response is empty");
+    }
+    _isLoading = false;
   }
 
   @override
@@ -35,6 +52,8 @@ class ChatState extends State<Chat> {
             IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: () {
+                Provider.of<UserController>(context, listen: false)
+                    .setCurrentUser(null);
                 Navigator.pushNamed(context, '/login');
               },
             ),
@@ -80,14 +99,25 @@ class ChatState extends State<Chat> {
           child: ListView.builder(
             itemCount: _messages.length,
             itemBuilder: (context, index) {
-              return message(context, _messages[index]);
+              return ListTile(
+                title: Text(
+                  _messages[index].query,
+                  style: const TextStyle(
+                      color: Colors.orange), // Set the title color to orange
+                ),
+                subtitle: Text(
+                  _messages[index].answer,
+                  style: const TextStyle(
+                      color: Colors.green), // Set the subtitle color to green
+                ),
+              );
             },
           ),
         ),
         const SizedBox(
           height: 20,
         ),
-        messageBox(_controller, _sendMessage),
+        messageBox(_controller),
         const SizedBox(
           height: 20,
         ),
@@ -95,8 +125,7 @@ class ChatState extends State<Chat> {
     );
   }
 
-  Widget messageBox(
-      TextEditingController controller, VoidCallback sendMessage) {
+  Widget messageBox(TextEditingController controller) {
     return Container(
       width: MediaQuery.of(context).size.width * 0.9,
       padding: const EdgeInsets.only(top: 11, left: 8, right: 7, bottom: 13),
@@ -114,30 +143,46 @@ class ChatState extends State<Chat> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Flexible(
-            child: TextField(
-              controller: controller,
-              decoration: const InputDecoration(
-                hintText: 'Message here ...',
-                hintStyle: TextStyle(
-                  color: Color(0xFF9098B1),
-                  fontSize: 12,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w400,
-                  height: 0.15,
-                  letterSpacing: 0.50,
-                ),
-                border: InputBorder.none,
-              ),
-            ),
+            child: _isLoading
+                ? const CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.green))
+                : TextField(
+                    controller: controller,
+                    decoration: const InputDecoration(
+                      hintText: 'Message here ...',
+                      hintStyle: TextStyle(
+                        color: Color(0xFF9098B1),
+                        fontSize: 12,
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.w400,
+                        height: 0.15,
+                        letterSpacing: 0.50,
+                      ),
+                      border: InputBorder.none,
+                    ),
+                  ),
           ),
           Align(
             alignment: Alignment.center,
             child: IconButton(
               color: Colors.green,
-              icon: const Icon(Icons.send),
-              onPressed: sendMessage,
+              icon: _isLoading
+                  ? const CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.green))
+                  : const Icon(Icons.send),
+              onPressed: () async {
+                if (_controller.text.isNotEmpty) {
+                  setState(() {
+                    _isLoading = true;
+                  });
+                  await _sendMessage(_controller.text);
+                  setState(() {
+                    _isLoading = false;
+                  });
+                }
+              },
             ),
-          )
+          ),
         ],
       ),
     );
@@ -178,4 +223,10 @@ Widget message(context, mssg) {
       ],
     ),
   );
+}
+
+class Message {
+  final String query;
+  final String answer;
+  Message(this.query, this.answer);
 }

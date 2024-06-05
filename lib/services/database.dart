@@ -12,18 +12,17 @@ class DatabaseMethods {
   }
 
   //READ
-  Future<bool> getUser(String email, String password) async {
-    // Assuming you want to find a user by email and password
+  Future<Map<String, dynamic>> getUser(String email, String password) async {
+    // find a user by email and password
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection('users')
         .where('email', isEqualTo: email)
         .where('password', isEqualTo: password)
         .get();
-    print(querySnapshot.docs.first);
     if (querySnapshot.docs.isNotEmpty) {
-      return true;
+      return {"exists": true, "data": querySnapshot.docs.first.data()};
     } else {
-      return false;
+    return {"exists": false};
     }
   }
   //UPDATE

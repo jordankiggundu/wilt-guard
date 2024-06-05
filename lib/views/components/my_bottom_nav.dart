@@ -8,11 +8,11 @@ class CustomBottomNavigationBar extends StatefulWidget {
       {super.key, required this.widgetOptions, required this.onTabSelected});
 
   @override
-  _CustomBottomNavigationBarState createState() =>
-      _CustomBottomNavigationBarState();
+  CustomBottomNavigationBarState createState() =>
+      CustomBottomNavigationBarState();
 }
 
-class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
+class CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
   int _selectedIndex = 0;
 
   void _onItemTapped(int index) {

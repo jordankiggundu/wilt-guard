@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -45,7 +46,6 @@ class _HomeState extends State<Home> {
     ];
     //return response
     final response = await model.generateContent(content);
-    print(response.text);
     responseData = response.text!;
   }
 
@@ -128,7 +128,37 @@ class _HomeState extends State<Home> {
                       _isLoading = true;
                     });
                     await checkCoffeeWilt(_image!.path);
-                    print(responseData);
+                    Map<String, dynamic> responseMap = jsonDecode(responseData);
+                    String status = responseMap['status'];
+                    String comment = responseMap['comment'];
+
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text(
+                            'Infected: $status',
+                            style: const TextStyle(
+                                color: Colors.orange, fontSize: 20),
+                          ),
+                          content: Text(
+                            comment,
+                            style: const TextStyle(
+                                color: Colors.green,
+                                fontSize: 16), // Comment in green
+                          ),
+                          actions: <Widget>[
+                            TextButton(
+                              child: Text('OK'),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
+
                     setState(() {
                       _isLoading = false;
                     });

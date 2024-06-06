@@ -138,7 +138,7 @@ class LoginFormState extends State<LoginForm> {
                       );
                     },
                   ).then((_) {
-                    // Check if responseData['data'] is not null before proceeding
+                    // Check if response Data is not null before proceeding
                     if (result['data'] != null &&
                         result.containsKey('data') &&
                         result['data'] != null) {

@@ -2,12 +2,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DatabaseMethods {
   //CREATE
-  Future addUser( Map<String, dynamic> userMap, String id ) async {
+  Future addUser(Map<String, dynamic> userMap, String id) async {
     return await FirebaseFirestore.instance
-        .collection("users").doc(id).set(userMap);
+        .collection("users")
+        .doc(id)
+        .set(userMap);
   }
+
   //READ
-  Future <Stream<QuerySnapshot>> getUsers() async {
+  Future<Stream<QuerySnapshot>> getUsers() async {
     return FirebaseFirestore.instance.collection("users").snapshots();
   }
 
@@ -22,17 +25,33 @@ class DatabaseMethods {
     if (querySnapshot.docs.isNotEmpty) {
       return {"exists": true, "data": querySnapshot.docs.first.data()};
     } else {
-    return {"exists": false};
+      return {"exists": false};
     }
   }
+
   //UPDATE
-  Future updateUser( Map<String, dynamic> userMap, String id ) async {
-    return await FirebaseFirestore.instance
-        .collection("users").doc(id).update(userMap);
+  Future updateUser(Map<String, dynamic> userMap) async {
+    final QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .where('email', isEqualTo: userMap['email'])
+        .get();
+    String uid;
+    if (querySnapshot.docs.isNotEmpty) {
+      uid = querySnapshot
+          .docs.first.id; // Returns the ID of the first matching document
+
+      return await FirebaseFirestore.instance
+          .collection("users")
+          .doc(uid)
+          .update(userMap);
+    }
   }
+
   //DELETE
-  Future deleteUser(String id ) async {
+  Future deleteUser(String id) async {
     return await FirebaseFirestore.instance
-        .collection("users").doc(id).delete();
+        .collection("users")
+        .doc(id)
+        .delete();
   }
 }

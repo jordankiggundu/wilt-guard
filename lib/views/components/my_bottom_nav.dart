@@ -31,12 +31,12 @@ class CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
           label: 'Home',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.explore),
-          label: 'Explore',
-        ),
-        BottomNavigationBarItem(
           icon: Icon(Icons.message),
           label: 'Chat',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.explore),
+          label: 'Explore',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.person),

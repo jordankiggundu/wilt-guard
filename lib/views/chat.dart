@@ -46,18 +46,32 @@ class ChatState extends State<Chat> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () {
-                Provider.of<UserController>(context, listen: false)
-                    .setCurrentUser(null);
-                Navigator.pushNamed(context, '/login');
-              },
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.exit_to_app),
+                    onPressed: () {
+                      Provider.of<UserController>(context, listen: false)
+                          .setCurrentUser(null);
+                      Navigator.pushNamed(context, '/login');
+                    },
+                  ),
+                  const Text(
+                    'Sign Out',
+                    style: TextStyle(
+                      color: Colors.red, // Adjust the color as needed
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
             ),
             const Padding(
               padding: EdgeInsets.only(right: 20),
               child: Text(
-                'chat',
+                'Chat',
                 style: TextStyle(
                   color: Color(0xFF9098B1),
                   fontSize: 16,
@@ -68,7 +82,7 @@ class ChatState extends State<Chat> {
                 ),
                 textAlign: TextAlign.center,
               ),
-            )
+            ),
           ],
         ),
         const SizedBox(

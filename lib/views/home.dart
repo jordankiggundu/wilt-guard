@@ -17,8 +17,43 @@ class _HomeState extends State<Home> {
   XFile? _image;
 
   Future getImage() async {
+    int? result = await showDialog<int>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Select Image Source'),
+          content: const Text(
+              'Do you want to select an image from gallery or capture one using camera?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Gallery'),
+              onPressed: () {
+                Navigator.of(context).pop(1);
+              },
+            ),
+            TextButton(
+              child: const Text('Camera'),
+              onPressed: () {
+                Navigator.of(context).pop(2);
+              },
+            ),
+          ],
+        );
+      },
+    );
+
+    // Map the integer result to ImageSource
+    ImageSource? source;
+    if (result == 1) {
+      source = ImageSource.gallery;
+    } else if (result == 2) {
+      source = ImageSource.camera;
+    } else {
+      return;
+    }
+
     final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    final XFile? image = await picker.pickImage(source: source);
 
     setState(() {
       _image = image;
@@ -47,6 +82,7 @@ class _HomeState extends State<Home> {
     //return response
     final response = await model.generateContent(content);
     responseData = response.text!;
+    _image = null;
   }
 
   @override
@@ -57,15 +93,45 @@ class _HomeState extends State<Home> {
           height: 40,
         ),
         Row(
-          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () {
-                Provider.of<UserController>(context, listen: false)
-                    .setCurrentUser(null);
-                Navigator.pushNamed(context, '/login');
-              },
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.exit_to_app),
+                    onPressed: () {
+                      Provider.of<UserController>(context, listen: false)
+                          .setCurrentUser(null);
+                      Navigator.pushNamed(context, '/login');
+                    },
+                  ),
+                  const SizedBox(width: 8), // Space between icon and text
+                  const Text(
+                    'Sign Out',
+                    style: TextStyle(
+                      color: Colors.red, // Adjust the color as needed
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Padding(
+              padding: EdgeInsets.only(right: 20),
+              child: Text(
+                'Diagnosis',
+                style: TextStyle(
+                  color: Color(0xFF9098B1),
+                  fontSize: 16,
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.w400,
+                  height: 0.12,
+                  letterSpacing: 0.50,
+                ),
+                textAlign: TextAlign.center,
+              ),
             ),
           ],
         ),
@@ -96,7 +162,7 @@ class _HomeState extends State<Home> {
                   padding: const EdgeInsets.all(20.0),
                   child: Card(
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(30),
                     ),
                     child: Container(
                       color: Colors.grey[300],

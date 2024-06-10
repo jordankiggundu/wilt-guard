@@ -12,7 +12,7 @@ class Explore extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.exit_to_app),
           onPressed: () {
             Provider.of<UserController>(context, listen: false)
                 .setCurrentUser(null);

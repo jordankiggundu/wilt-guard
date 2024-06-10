@@ -29,22 +29,26 @@ class DatabaseMethods {
     }
   }
 
-  //UPDATE
-  Future updateUser(Map<String, dynamic> userMap) async {
+  //get uid for user document
+  Future<String> getUid(Map<String, dynamic> userMap) async {
     final QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection('users')
         .where('email', isEqualTo: userMap['email'])
         .get();
     String uid;
     if (querySnapshot.docs.isNotEmpty) {
-      uid = querySnapshot
-          .docs.first.id; // Returns the ID of the first matching document
-
-      return await FirebaseFirestore.instance
-          .collection("users")
-          .doc(uid)
-          .update(userMap);
+      uid = querySnapshot.docs.first.id;
+      return uid;
     }
+    return "false";
+  }
+
+  //UPDATE
+  Future updateUser(Map<String, dynamic> userMap, String? uid) async {
+    return await FirebaseFirestore.instance
+        .collection("users")
+        .doc(uid)
+        .update(userMap);
   }
 
   //DELETE

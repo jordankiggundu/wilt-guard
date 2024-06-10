@@ -50,7 +50,6 @@ class MyApp extends StatelessWidget {
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
-
   @override
   MainPageState createState() => MainPageState();
 }
@@ -59,9 +58,9 @@ class MainPageState extends State<MainPage> {
   int _selectedIndex = 0;
   final List<Widget> _widgetOptions = [
     const Home(),
-    const Explore(),
     const Chat(),
-    const Account()
+    const Explore(),
+    const Account(),
   ];
 
   void _onItemTapped(int index) {

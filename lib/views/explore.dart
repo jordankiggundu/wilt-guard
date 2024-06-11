@@ -1,9 +1,25 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wiltguard/controllers/user_controller.dart';
+import 'package:http/http.dart' as http;
 
-class Explore extends StatelessWidget {
-  const Explore({Key? key}) : super(key: key);
+class Explore extends StatefulWidget {
+  const Explore({super.key});
+
+  @override
+  ExploreState createState() => ExploreState();
+}
+
+class ExploreState extends State<Explore> {
+  late Future<List<Article>> futureArticles;
+
+  @override
+  void initState() {
+    super.initState();
+    futureArticles = fetchArticles();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,64 +50,57 @@ class Explore extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: feed(context),
+        child: FutureBuilder<List<Article>>(
+          future: futureArticles,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return ListView.builder(
+                itemCount: snapshot.data!.length,
+                itemBuilder: (context, index) {
+                  return Column(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                        ),
+                        child: ListTile(
+                          title: Text(
+                            snapshot.data![index].title,
+                            style: const TextStyle(color: Colors.green),
+                          ),
+                          subtitle: Text(snapshot.data![index].description),
+                          trailing: Text(snapshot.data![index].publishedAt),
+                          onTap: () =>
+                              _showDialog(context, snapshot.data![index]),
+                        ),
+                      ),
+                      const Divider(),
+                    ],
+                  );
+                },
+              );
+            } else if (snapshot.hasError) {
+              return Text("${snapshot.error}");
+            }
+            // By default, show a loading spinner.
+            return const Center(child: CircularProgressIndicator());
+          },
+        ),
       ),
     );
   }
 
-  Widget feed(BuildContext context) {
-    // Example data structure for an article
-    final List<Article> articles = [
-      Article(
-          title: 'Planting Coffee Seeds',
-          subtitle: 'Starting Strong with Coffee Seeds',
-          content:
-              'Coffee cultivation begins with selecting high-quality seeds. Plant them in well-drained soil, ideally in a nursery bed, keeping them moist and warm. Germination usually takes 2-3 months. Regular watering and protection from pests are crucial during this stage.',
-          date: "2/3/24"),
-      Article(
-          title: 'Nurturing Young Coffee Plants',
-          subtitle: 'Growing Up: Caring for Young Coffee Plants',
-          content:
-              'TOnce sprouted, young coffee plants require careful attention. Transplant them into larger pots or directly into the ground, ensuring they receive plenty of sunlight. Fertilize monthly with organic compost to promote healthy growth. Pruning helps shape the plant and encourages fruit production.',
-          date: "12/3/24"),
-      Article(
-          title: 'Harvesting Coffee Cherries',
-          subtitle: 'ime to Pick: Harvesting Coffee Cherries',
-          content:
-              'Harvesting is a meticulous process. Coffee cherries are ready when they turn bright red. Hand-picking ensures quality, though mechanical methods are faster. Timing is critical; pick too early, and the beans are underdeveloped, too late, and they lose flavor.',
-          date: "6/4/24"),
-    ];
+  Future<List<Article>> fetchArticles() async {
+    final response = await http.get(Uri.parse(
+        'https://newsapi.org/v2/everything?q=agriculture&from=2024-06-01&to=2024-06-10&sortBy=popularity&apiKey=8684f18e16c14603b1d7cc099f81773b'));
 
-    return ListView.builder(
-      itemCount:
-          articles.length + 1, // Adjust itemCount to accommodate the Divider
-      itemBuilder: (context, index) {
-        if (index >= articles.length) {
-          // Check if it's the last item
-          return SizedBox(
-              height: 0); // Return an empty SizedBox for the last divider
-        }
-        return Column(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.grey[200], // Light grey background
-              ),
-              child: ListTile(
-                title: Text(
-                  articles[index].title,
-                  style: TextStyle(color: Colors.green), // Green text color
-                ),
-                subtitle: Text(articles[index].subtitle),
-                trailing: Text(articles[index].date),
-                onTap: () => _showDialog(context, articles[index]),
-              ),
-            ),
-            const Divider(),
-          ],
-        );
-      },
-    );
+    if (response.statusCode == 200) {
+      // If the server returns a 200 OK response, parse the JSON.
+      List jsonResponse = json.decode(response.body)['articles'];
+      return jsonResponse.map((article) => Article.fromMap(article)).toList();
+    } else {
+      throw Exception('Failed to load articles');
+    }
   }
 
   void _showDialog(BuildContext context, Article article) {
@@ -122,13 +131,36 @@ class Explore extends StatelessWidget {
 }
 
 class Article {
+  final String? source;
+  final String? author;
   final String title;
-  final String subtitle;
+  final String description;
+  final String? url;
+  final String? urlToImage;
+  final String publishedAt;
   final String content;
-  final String date;
-  Article(
-      {required this.title,
-      required this.subtitle,
-      required this.content,
-      required this.date});
+
+  Article({
+    this.source,
+    this.author,
+    required this.title,
+    required this.description,
+    this.url,
+    this.urlToImage,
+    required this.publishedAt,
+    required this.content,
+  });
+
+  factory Article.fromMap(Map<String, dynamic> json) {
+    return Article(
+      source: json['source']['name'] ?? '',
+      author: json['author'] ?? '',
+      title: json['title'] ?? '',
+      description: json['description'] ?? '',
+      url: json['url'] ?? '',
+      urlToImage: json['urlToImage'] ?? '',
+      publishedAt: json['publishedAt'] ?? '',
+      content: json['content'] ?? '',
+    );
+  }
 }

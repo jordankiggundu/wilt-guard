@@ -176,7 +176,7 @@ class RegistrationFormState extends State<RegistrationForm> {
                             onPressed: () {
                               Navigator.popAndPushNamed(context, '/login');
                             },
-                            child: Text("OK"),
+                            child: const Text("OK"),
                           ),
                         ],
                       );
@@ -196,7 +196,7 @@ class RegistrationFormState extends State<RegistrationForm> {
                         actions: [
                           TextButton(
                             onPressed: () {},
-                            child: Text("OK"),
+                            child: const Text("OK"),
                           ),
                         ],
                       );

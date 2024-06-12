@@ -1,19 +1,22 @@
 import 'dart:convert';
+import 'package:firebase_ml_model_downloader/firebase_ml_model_downloader.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'dart:io';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:wiltguard/controllers/user_controller.dart';
+import 'package:tflite_flutter/tflite_flutter.dart';
+import 'package:image/image.dart' as img;
 
 class Home extends StatefulWidget {
   const Home({super.key});
 
   @override
-  _HomeState createState() => _HomeState();
+  HomeState createState() => HomeState();
 }
 
-class _HomeState extends State<Home> {
+class HomeState extends State<Home> {
   XFile? _image;
 
   Future getImage() async {
@@ -83,6 +86,52 @@ class _HomeState extends State<Home> {
     final response = await model.generateContent(content);
     responseData = response.text!;
     _image = null;
+  }
+
+  FirebaseCustomModel? firebaseCustomModel;
+  Interpreter? interpreter;
+  Future<void> loadModel() async {
+    const modelName = 'Wilt-Detector';
+    const downloadType = FirebaseModelDownloadType.latestModel;
+    firebaseCustomModel = await FirebaseModelDownloader.instance.getModel(
+      modelName,
+      downloadType,
+    );
+    try {
+      interpreter = await Interpreter.fromAsset(modelName);
+    } catch (e) {
+      print('Error loading model: $e');
+    }
+  }
+
+  Future<void> predictWithImage(String imagePath) async {
+    // Resize the image to 320x320
+    final resizedImage = await _resizeImage(File(imagePath), 320, 320);
+    final input = [resizedImage];
+    // Run inference
+    final output = interpreter!.getOutputTensor(0).numElements;
+    interpreter!.run(input, output);
+    final prediction = output;
+  }
+
+  Future<File> _resizeImage(File file, int width, int height) async {
+    final decodedImage = img.decodeImage(await file.readAsBytes());
+
+    if (decodedImage == null) {
+      throw Exception('Failed to decode image');
+    }
+    final resizedImage =
+        img.copyResize(decodedImage, width: width, height: height);
+
+    // Encode the resized image back to bytes
+    final byteData = resizedImage.getBytes();
+
+    // Write the resized image bytes to a new file
+    final newFile = File(file.path
+        .replaceAll('.jpg', '_resized.jpg')); // Adjust the extension as needed
+    await newFile.writeAsBytes(byteData);
+
+    return newFile;
   }
 
   @override
@@ -210,12 +259,11 @@ class _HomeState extends State<Home> {
                           content: Text(
                             comment,
                             style: const TextStyle(
-                                color: Colors.green,
-                                fontSize: 16), // Comment in green
+                                color: Colors.green, fontSize: 16),
                           ),
                           actions: <Widget>[
                             TextButton(
-                              child: Text('OK'),
+                              child: const Text('OK'),
                               onPressed: () {
                                 Navigator.of(context).pop();
                               },

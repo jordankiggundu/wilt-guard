@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wiltguard/controllers/user_controller.dart';
@@ -36,7 +35,7 @@ class ExploreState extends State<Explore> {
           },
         ),
         title: const Text(
-          'Knowledge Base, Articles, and more',
+          'Knowledge Base, Articles, and news',
           style: TextStyle(
             color: Color(0xFF9098B1),
             fontSize: 16,

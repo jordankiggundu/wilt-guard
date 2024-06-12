@@ -100,7 +100,7 @@ class HomeState extends State<Home> {
     try {
       interpreter = await Interpreter.fromAsset(modelName);
     } catch (e) {
-      print('Error loading model: $e');
+      return;
     }
   }
 
